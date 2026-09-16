@@ -9,6 +9,10 @@
     showStart = false, showEnd = false, showMid = false,
     labels = false,
     highlight = null, // the rounded answer, once it is known: draws the arrow
+    showPoint = true,
+    interactive = false,
+    plotValue = null,
+    onplot = null,
     muted = false,
   } = $props()
 
@@ -23,7 +27,8 @@
   const tickValue = (i) => start + ((end - start) * i) / 10
 </script>
 
-<svg viewBox="0 0 {W} {H}" class:muted role="img" aria-label="Number line from {start} to {end} showing {n}">
+<svg viewBox="0 0 {W} {H}" class:muted role={interactive ? 'group' : 'img'}
+  aria-label={showPoint ? `Number line from ${start} to ${end} showing ${n}` : `Number line from ${start} to ${end}. Plot ${n}.`}>
   <line x1={PAD - 40} y1={Y} x2={W - PAD + 40} y2={Y} class="rail" />
   <polygon points="{PAD - 54},{Y} {PAD - 36},{Y - 9} {PAD - 36},{Y + 9}" class="arrowhead" />
   <polygon points="{W - PAD + 54},{Y} {W - PAD + 36},{Y - 9} {W - PAD + 36},{Y + 9}" class="arrowhead" />
@@ -35,6 +40,17 @@
       class="tick" class:major class:midtick={i === 5} />
     {#if labels && !major}
       <text x={x} y={Y + 46} text-anchor="middle" class="minor-label">{fmt(tickValue(i))}</text>
+    {/if}
+    {#if interactive}
+      <circle cx={x} cy={Y} r="30" class="plot-target" role="button" tabindex="0"
+        aria-label="Plot at {fmt(tickValue(i))}"
+        onclick={() => onplot?.(tickValue(i))}
+        onkeydown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onplot?.(tickValue(i))
+          }
+        }} />
     {/if}
   {/each}
 
@@ -53,11 +69,21 @@
     <text class="tag" x={W / 2} y={Y + 84} text-anchor="middle">midpoint · halfway</text>
   </g>
 
-  <g class="dot">
-    <line x1={dotX} y1={Y - 34} x2={dotX} y2={Y} class="drop" />
-    <circle cx={dotX} cy={Y} r="13" class="point" />
-    <text x={dotX} y={Y - 46} text-anchor="middle" class="n">{fmt(n)}</text>
-  </g>
+  {#if plotValue !== null}
+    {@const plotX = xOf(plotValue)}
+    <g class="student-dot" aria-label="Your point at {fmt(plotValue)}">
+      <line x1={plotX} y1={Y} x2={plotX} y2={Y + 8} class="student-drop" />
+      <circle cx={plotX} cy={Y + 17} r="11" class="student-point" />
+    </g>
+  {/if}
+
+  {#if showPoint}
+    <g class="dot">
+      <line x1={dotX} y1={Y - 34} x2={dotX} y2={Y} class="drop" />
+      <circle cx={dotX} cy={Y} r="13" class="point" />
+      <text x={dotX} y={Y - 46} text-anchor="middle" class="n">{fmt(n)}</text>
+    </g>
+  {/if}
 
   {#if highlight !== null}
     {@const tx = xOf(highlight)}
@@ -81,6 +107,8 @@
   .tick.major { stroke-width: 5; }
   .tick.midtick { stroke: var(--purple); }
   .minor-label { font-size: 22px; font-weight: 600; fill: var(--muted); }
+  .plot-target { fill: transparent; cursor: pointer; outline: none; }
+  .plot-target:hover, .plot-target:focus-visible { fill: color-mix(in srgb, var(--blue) 16%, transparent); stroke: var(--blue); stroke-width: 3; }
   .label text { font-size: 42px; font-weight: 800; fill: #b6bcc8; }
   .label .tag {
     font-size: 19px;
@@ -96,6 +124,8 @@
   .drop { stroke: var(--red); stroke-width: 3; stroke-dasharray: 6 5; }
   .point { fill: var(--red); stroke: #fff; stroke-width: 4; }
   .n { font-size: 36px; font-weight: 800; fill: var(--red); }
+  .student-drop { stroke: var(--blue); stroke-width: 4; }
+  .student-point { fill: var(--blue); stroke: #fff; stroke-width: 4; }
   .jump { stroke: var(--green); stroke-width: 7; stroke-linecap: round; opacity: 0.9; }
   .jumphead { fill: var(--green); }
 </style>

@@ -9,7 +9,11 @@
   let { settings } = $props()
 
   const guided = $derived(settings.mode === 'guided')
-  const stepIds = $derived(guided ? STEPS.map((s) => s.id) : ['round'])
+  const stepIds = $derived(
+    guided
+      ? STEPS.filter((s) => settings.plot || s.id !== 'plot').map((s) => s.id)
+      : settings.plot ? ['plot', 'round'] : ['round'],
+  )
 
   let phase = $state('ready') // ready | running | done
   let problem = $state(randomProblem(settings))
@@ -26,8 +30,12 @@
   let ticker = null
   let inputEl = $state(null)
   let continueEl = $state(null)
+  let selectedPlot = $state(null)
 
   const step = $derived(stepIds[stepIndex])
+  const stepInfo = $derived(STEPS.find((s) => s.id === step))
+  const plotStepIndex = $derived(stepIds.indexOf('plot'))
+  const showTargetPoint = $derived(!settings.plot || stepIndex > plotStepIndex || (step === 'plot' && locked))
   const done = $derived(results.length)
   const correct = $derived(results.filter((r) => r.misses.length === 0).length)
   const revealed = $derived(step === 'round' && locked)
@@ -47,6 +55,7 @@
     problem = p
     stepIndex = 0
     misses = []
+    selectedPlot = null
     resetStep()
   }
 
@@ -71,7 +80,14 @@
     if (locked) return
     const want = stepAnswer(step, problem)
     if (guess === want) {
-      feedback = { ok: true, msg: step === 'round' ? `Correct! ${explainRounding(problem)}` : `Yes — the ${STEPS[stepIndex].label} is ${fmt(want)}.` }
+      feedback = {
+        ok: true,
+        msg: step === 'round'
+          ? `Correct! ${explainRounding(problem)}`
+          : step === 'plot'
+            ? `Yes — ${fmt(problem.n)} belongs ${problem.halfway ? 'at' : problem.n > problem.mid ? 'after' : 'before'} the midpoint (${fmt(problem.mid)}).`
+            : `Yes — the ${stepInfo.label} is ${fmt(want)}.`,
+      }
       if (step === 'round') {
         locked = true
         focusContinue()
@@ -79,6 +95,7 @@
         stepIndex += 1
         input = ''
         wrongTries = 0
+        if (step === 'plot') selectedPlot = null
         focusInput()
       }
       return
@@ -97,7 +114,9 @@
       ok: false,
       msg: step === 'round'
         ? `Not quite. ${explainRounding(problem)}`
-        : `Not quite — the ${STEPS[stepIndex].label} is ${fmt(want)}. ${stepHint(step, problem)}`,
+        : step === 'plot'
+          ? `Not quite. The red point shows where ${fmt(problem.n)} belongs. ${stepHint(step, problem)}`
+          : `Not quite — the ${stepInfo.label} is ${fmt(want)}. ${stepHint(step, problem)}`,
     }
     locked = true
     focusContinue()
@@ -113,10 +132,17 @@
     focusInput()
   }
 
+  function plotAt(value) {
+    if (locked || step !== 'plot') return
+    selectedPlot = value
+    answer(value)
+  }
+
   // After a reveal: move to the next step, or wrap the question up.
   function proceed() {
     if (step !== 'round') {
       stepIndex += 1
+      selectedPlot = null
       resetStep()
       return
     }
@@ -166,7 +192,9 @@
       <p class="gate-help">
         {#if guided}
           For each number you'll find the <b>starting point</b>, the <b>end point</b> and the
-          <b>midpoint</b>, then decide which way it rounds.
+          <b>midpoint</b>{settings.plot ? ', plot the number,' : ''} then decide which way it rounds.
+        {:else if settings.plot}
+          For each number, plot it on the line, compare it with the <b>midpoint</b>, and decide which way it rounds.
         {:else}
           For each number, look at where it sits on the line and decide which way it rounds.
         {/if}
@@ -186,11 +214,12 @@
       <NumberLine n={problem.n} start={problem.start} end={problem.end} mid={problem.mid}
         labels={settings.labels}
         showStart={stepIndex > 0 || !guided} showEnd={stepIndex > 1 || !guided} showMid={stepIndex > 2 || !guided}
+        showPoint={showTargetPoint} interactive={step === 'plot' && !locked} plotValue={selectedPlot} onplot={plotAt}
         highlight={revealed ? problem.answer : null} />
 
       {#if guided}
         <ol class="steps" aria-label="Steps">
-          {#each STEPS as s, i (s.id)}
+          {#each STEPS.filter((s) => stepIds.includes(s.id)) as s, i (s.id)}
             <li class:done={i < stepIndex} class:current={i === stepIndex}>{s.label}</li>
           {/each}
         </ol>
@@ -198,7 +227,9 @@
 
       <p class="prompt">{stepQuestion(step, problem)}</p>
 
-      {#if step === 'round'}
+      {#if step === 'plot'}
+        <p class="plot-help">Tap or click a tick mark to place your point.</p>
+      {:else if step === 'round'}
         <div class="choices">
           <button type="button" class="choice down" disabled={locked} onclick={() => answer(problem.start)}>
             ⬇ Round down to {fmt(problem.start)}
@@ -329,6 +360,7 @@
   .steps li.done { background: var(--green-soft); color: var(--green); }
 
   .prompt { font-size: 1.15rem; font-weight: 600; margin: 0.25rem 0 0.9rem; }
+  .plot-help { margin: -0.2rem 0 0; color: var(--muted); }
 
   .answer { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; }
   .answer input {

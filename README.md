@@ -18,6 +18,8 @@ QR code) update on the right.
 - **How students answer** — *Guided* asks for the starting point, end point and
   midpoint before rounding; *Quick* shows the number on the line and just asks
   which way it rounds
+- **Have students plot the number first** — hides the target dot and asks the
+  student to choose the closest tick before rounding
 - **Number of questions** — 1–100
 - **Number every tick mark** — an easier line with every tick labelled
 - **Allow retries** — students try a step again after a miss (the miss still
@@ -33,7 +35,7 @@ printed.
 
 ## Link format
 
-`/practice?to=10,100&max=1000&n=10&mode=guided&labels=0&retry=0`
+`/practice?to=10,100&max=1000&n=10&mode=guided&plot=1&labels=0&retry=0`
 
 | param    | meaning                                  |
 | -------- | ---------------------------------------- |
@@ -41,6 +43,7 @@ printed.
 | `max`    | largest number: 100, 1000 or 10000       |
 | `n`      | number of questions (1–100)              |
 | `mode`   | `guided` or `quick`                      |
+| `plot`   | `1` asks the student to plot the number  |
 | `labels` | `1` numbers every tick mark              |
 | `retry`  | `1` allows retries                       |
 

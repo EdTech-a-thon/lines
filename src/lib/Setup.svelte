@@ -104,6 +104,10 @@
             <span class="mode-desc">See the number on the line and just choose which way it rounds.</span>
           </label>
         </div>
+        <label class="switch plot-switch">
+          <input type="checkbox" bind:checked={settings.plot} />
+          <span>Have students plot the number first <small>(they choose the closest tick before deciding which way to round)</small></span>
+        </label>
       </fieldset>
 
       <fieldset>
@@ -197,6 +201,7 @@
   .mode input { grid-row: 1 / span 2; align-self: start; margin-top: 0.2rem; accent-color: var(--blue); }
   .mode-title { font-weight: 700; }
   .mode-desc { font-size: 0.88rem; color: var(--muted); }
+  .plot-switch { margin-top: 0.8rem; }
 
   .limit { display: flex; align-items: center; gap: 0.9rem; font-weight: 600; margin: 0.4rem 0 0.8rem; }
   .limit input {

@@ -30,6 +30,7 @@ export const STEPS = [
   { id: 'start', label: 'starting point' },
   { id: 'end', label: 'end point' },
   { id: 'mid', label: 'midpoint' },
+  { id: 'plot', label: 'plotting' },
   { id: 'round', label: 'rounding' },
 ]
 
@@ -41,6 +42,8 @@ export function stepQuestion(step, p) {
       return `What is the end point? (The nearest ${fmt(p.unit)} above ${fmt(p.n)})`
     case 'mid':
       return `What is the midpoint? (Halfway between ${fmt(p.start)} and ${fmt(p.end)})`
+    case 'plot':
+      return `Plot ${fmt(p.n)} on the number line. Choose the tick mark closest to where it belongs.`
     default:
       return `Is ${fmt(p.n)} closer to ${fmt(p.start)} or ${fmt(p.end)}? Which way does it round?`
   }
@@ -54,6 +57,9 @@ export function stepHint(step, p) {
       return `Add ${fmt(p.unit)} to the starting point, ${fmt(p.start)}.`
     case 'mid':
       return `Halfway between ${fmt(p.start)} and ${fmt(p.end)} is ${fmt(p.start)} + ${fmt(p.unit / 2)}.`
+    case 'plot':
+      if (p.halfway) return `${fmt(p.n)} belongs right on the midpoint (${fmt(p.mid)}).`
+      return `${fmt(p.n)} is ${p.n > p.mid ? 'greater than' : 'less than'} the midpoint (${fmt(p.mid)}), so choose a tick on that side.`
     default:
       return p.halfway
         ? `${fmt(p.n)} is exactly halfway. Halfway always rounds up.`
@@ -62,7 +68,14 @@ export function stepHint(step, p) {
 }
 
 export function stepAnswer(step, p) {
+  if (step === 'plot') return nearestPlotValue(p)
   return step === 'round' ? p.answer : p[step]
+}
+
+/** The line has ten equal spaces; use the tick nearest to the target number. */
+export function nearestPlotValue(p) {
+  const tickSize = (p.end - p.start) / 10
+  return p.start + Math.round((p.n - p.start) / tickSize) * tickSize
 }
 
 /** Why the number rounds the way it does, for the feedback after the last step. */

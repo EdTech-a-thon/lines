@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS = {
   max: 100,         // numbers go up to this (like the classroom 0–100 line)
   count: 10,        // questions in the drill
   mode: 'guided',   // 'guided' asks start, end, midpoint then round; 'quick' just asks round
+  plot: false,      // ask students to place the number on the line before rounding
   labels: false,    // number every tick mark on the line
   retry: false,     // let students try a step again after a wrong answer
 }
@@ -19,6 +20,7 @@ export function settingsToQuery(s) {
   p.set('max', String(s.max))
   p.set('n', String(s.count))
   p.set('mode', s.mode)
+  p.set('plot', s.plot ? '1' : '0')
   p.set('labels', s.labels ? '1' : '0')
   p.set('retry', s.retry ? '1' : '0')
   return p.toString()
@@ -38,6 +40,7 @@ export function settingsFromParams(params) {
     max,
     count: clampCount(params.get('n'), d.count),
     mode,
+    plot: bool(params.get('plot'), d.plot),
     labels: bool(params.get('labels'), d.labels),
     retry: bool(params.get('retry'), d.retry),
   }
@@ -71,6 +74,7 @@ export function describeSettings(s) {
     `${s.count} question${s.count === 1 ? '' : 's'}`,
     s.mode === 'guided' ? 'guided steps' : 'quick rounding',
   ]
+  if (s.plot) parts.push('students plot each number')
   if (s.labels) parts.push('every tick numbered')
   if (s.retry) parts.push('retries allowed')
   return parts.join(' · ')
