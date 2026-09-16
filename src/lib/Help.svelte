@@ -59,13 +59,13 @@
 {/if}
 
 <style>
-  /* Matches the compact help control used across teacher.dev tools, but sits
-     in this app's top-right corner rather than at the foot of a side nav. */
+  /* Matches the compact help control used across teacher.dev tools and sits
+     at the lower-left edge of the app. */
   .help-button {
     position: fixed;
     z-index: 20;
-    top: 1rem;
-    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
