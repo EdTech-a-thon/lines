@@ -1,27 +1,58 @@
 # Rounding on a Number Line
 
-A small Svelte + Vite app that helps third graders practice rounding by finding the
-**starting point**, **end point**, and **midpoint (halfway)** on a number line.
+A small web app that helps third graders practise rounding by finding the
+**starting point**, **end point** and **midpoint (halfway)** on a number line.
+Teachers configure a drill and share a link; students work through it on their
+own device and get a report at the end. Everything runs in the browser — the
+settings live entirely in the link.
 
-For each number the student works through four steps:
+Live at **https://lines.teacher.dev**.
 
-1. Starting point — the nearest ten/hundred below the number (e.g. 325 → 320)
-2. End point — the nearest ten/hundred above (330)
-3. Midpoint — halfway between them (325)
-4. Round up or round down? Numbers at or past the midpoint round up.
+## Setting up a drill (home page)
 
-The number line reveals each label as it's found, then draws an arrow showing which
-way the number rounds. Wrong answers get a hint; after two misses a "Show me" button
-appears.
+Choose the settings on the left; a live preview and the shareable link (with a
+QR code) update on the right.
 
-Settings: round to the nearest **10** or **100**, use numbers up to **100** (matching
-classroom number lines) or **1,000**, or type in your own number.
+- **Round to the nearest** — 10, 100 and/or 1,000 (pick several for a mix)
+- **Numbers up to** — 100 (like classroom number lines), 1,000 or 10,000
+- **How students answer** — *Guided* asks for the starting point, end point and
+  midpoint before rounding; *Quick* shows the number on the line and just asks
+  which way it rounds
+- **Number of questions** — 1–100
+- **Number every tick mark** — an easier line with every tick labelled
+- **Allow retries** — students try a step again after a miss (the miss still
+  shows in the report)
 
-## Run it
+## Taking a drill
+
+Opening the link shows a start screen; the clock begins when the student presses
+**Start**. The top bar shows the question number, running score and time. When
+the drill ends, the results screen shows the score and a **report**: which steps
+were missed most, and a per-question table of every wrong answer. It can be
+printed.
+
+## Link format
+
+`/practice?to=10,100&max=1000&n=10&mode=guided&labels=0&retry=0`
+
+| param    | meaning                                  |
+| -------- | ---------------------------------------- |
+| `to`     | units to round to, comma-separated       |
+| `max`    | largest number: 100, 1000 or 10000       |
+| `n`      | number of questions (1–100)              |
+| `mode`   | `guided` or `quick`                      |
+| `labels` | `1` numbers every tick mark              |
+| `retry`  | `1` allows retries                       |
+
+Anything missing or invalid falls back to the default.
+
+## Running
 
 ```sh
 npm install
 npm run dev
 ```
 
-Build for deployment with `npm run build` (output in `dist/`).
+Build for deployment with `npm run build` (output in `dist/`). Set
+`VITE_CF_BEACON_TOKEN` to the Cloudflare Web Analytics token to add the beacon;
+leave it unset and no analytics script is loaded.
