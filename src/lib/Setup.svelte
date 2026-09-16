@@ -57,7 +57,10 @@
 
 <div class="page">
   <header class="intro">
-    <h1>Set up a rounding drill</h1>
+    <div class="title-row">
+      <img src="/favicon.svg" alt="" width="40" height="40" />
+      <h1>Set up a rounding drill</h1>
+    </div>
     <p>
       Choose the number line your class is using and how many questions to give. Then share the
       link — students work through it on their own and get a report at the end.
@@ -156,7 +159,9 @@
 <style>
   .page { max-width: 66rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
   .intro { margin-bottom: 1.5rem; }
-  .intro h1 { font-size: 1.9rem; font-weight: 800; margin-bottom: 0.4rem; }
+  .title-row { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.4rem; }
+  .title-row img { flex: none; }
+  .intro h1 { font-size: 1.9rem; font-weight: 800; }
   .intro p { margin: 0; color: var(--muted); max-width: 44rem; }
 
   .layout { display: grid; gap: 1.5rem; align-items: start; }

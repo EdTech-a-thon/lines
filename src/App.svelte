@@ -6,6 +6,7 @@
   import About from './lib/About.svelte'
   import Privacy from './lib/Privacy.svelte'
   import Footer from './lib/Footer.svelte'
+  import Help from './lib/Help.svelte'
   import { settingsFromParams } from './lib/settings.js'
 
   const path = window.location.pathname.replace(/\/$/, '') || '/'
@@ -25,6 +26,7 @@
     {/if}
   </main>
   <Footer />
+  <Help />
 </div>
 
 <style>
