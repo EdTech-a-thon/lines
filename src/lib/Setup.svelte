@@ -67,7 +67,7 @@
   <div class="layout">
     <section class="settings card">
       <fieldset>
-        <legend>Round to the nearest</legend>
+        <h3 class="legend">Round to the nearest</h3>
         <p class="hint">Pick more than one for a mix.</p>
         <div class="chips">
           {#each UNITS as u (u)}
@@ -78,7 +78,7 @@
       </fieldset>
 
       <fieldset>
-        <legend>Numbers up to</legend>
+        <h3 class="legend">Numbers up to</h3>
         <p class="hint">Classroom number lines usually go to 100. Larger ranges give three- and four-digit numbers.</p>
         <div class="chips">
           {#each MAXES as m (m)}
@@ -88,7 +88,7 @@
       </fieldset>
 
       <fieldset>
-        <legend>How students answer</legend>
+        <h3 class="legend">How students answer</h3>
         <div class="modes">
           <label class="mode" class:on={settings.mode === 'guided'}>
             <input type="radio" name="mode" value="guided" bind:group={settings.mode} />
@@ -104,7 +104,7 @@
       </fieldset>
 
       <fieldset>
-        <legend>Drill</legend>
+        <h3 class="legend">Drill</h3>
         <label class="limit">
           <span>Number of questions</span>
           <input type="number" min="1" max={MAX_QUESTIONS} step="1"
@@ -167,9 +167,9 @@
   .side { display: grid; gap: 1.25rem; }
 
   .settings { padding: 0.5rem 1.5rem 1rem; }
-  fieldset { border: 0; padding: 1.1rem 0; margin: 0; border-bottom: 1px solid var(--border); }
+  fieldset { border: 0; padding: 1.25rem 0; margin: 0; border-bottom: 1px solid var(--border); }
   fieldset:last-child { border-bottom: 0; }
-  legend { font-weight: 800; font-size: 1.05rem; padding: 0; margin-bottom: 0.3rem; }
+  .legend { font-weight: 800; font-size: 1.05rem; margin: 0 0 0.3rem; }
   .hint { margin: 0 0 0.7rem; color: var(--muted); font-size: 0.9rem; }
   .chip:disabled { opacity: 0.4; cursor: default; }
 

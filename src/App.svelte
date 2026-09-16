@@ -18,7 +18,10 @@
     {/if}
   </main>
   <footer class="no-print">
-    <a href="https://edtechathon.com" target="_blank" rel="noopener noreferrer">Built by the EdTech-a-thon</a>
+    <a class="built" href="https://teacher.dev" target="_blank" rel="noopener noreferrer">
+      <img src="/teacher-dev-logo.svg" alt="" width="22" height="22" />
+      Built by teacher.dev
+    </a>
     {#if isPractice}
       <a href="/">Make your own drill</a>
     {/if}
@@ -31,10 +34,12 @@
   footer {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 1.25rem;
     padding: 1.5rem 1.25rem 2rem;
     font-size: 0.9rem;
   }
   footer a { color: var(--muted); text-decoration: none; }
   footer a:hover { color: var(--blue-dark); }
+  .built { display: inline-flex; align-items: center; gap: 0.45rem; }
 </style>
