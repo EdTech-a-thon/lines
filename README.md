@@ -1,6 +1,6 @@
 # Rounding on a Number Line
 
-A small web app that helps third graders practise rounding by finding the
+A small web app that helps students practise rounding by finding the
 **starting point**, **end point** and **midpoint (halfway)** on a number line.
 Teachers configure a drill and share a link; students work through it on their
 own device and get a report at the end. Everything runs in the browser — the
@@ -13,8 +13,8 @@ Live at **https://lines.teacher.dev**.
 Choose the settings on the left; a live preview and the shareable link (with a
 QR code) update on the right.
 
-- **Round to the nearest** — 10, 100 and/or 1,000 (pick several for a mix)
-- **Numbers up to** — 100 (like classroom number lines), 1,000 or 10,000
+- **Round to the nearest** — any place from 0.001 through 1,000,000 (pick several for a mix)
+- **Numbers up to** — 1, 10, 100, …, 10,000,000
 - **How students answer** — *Guided* asks for the starting point, end point and
   midpoint before rounding; *Quick* shows the number on the line and just asks
   which way it rounds
@@ -40,7 +40,7 @@ printed.
 | param    | meaning                                  |
 | -------- | ---------------------------------------- |
 | `to`     | units to round to, comma-separated       |
-| `max`    | largest number: 100, 1000 or 10000       |
+| `max`    | largest number (1, 10, …, 10000000)     |
 | `n`      | number of questions (1–100)              |
 | `mode`   | `guided` or `quick`                      |
 | `plot`   | `1` asks the student to plot the number  |

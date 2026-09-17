@@ -2,7 +2,7 @@
   // The stretch of number line between the start and end points, split into ten
   // equal spaces. Labels appear as the student finds them; with `labels` on,
   // every tick is numbered from the beginning.
-  import { fmt } from './rounding.js'
+  import { fmt, lineTickValue, sameNumber } from './rounding.js'
 
   let {
     n, start, end, mid,
@@ -18,17 +18,18 @@
 
   const W = 1000
   const H = 200
-  const PAD = 70
+  const PAD = 90
   const Y = 105
   const ticks = Array.from({ length: 11 }, (_, i) => i)
 
   const xOf = (v) => PAD + ((v - start) / (end - start)) * (W - 2 * PAD)
   const dotX = $derived(xOf(n))
-  const tickValue = (i) => start + ((end - start) * i) / 10
+  const tickValue = (i) => lineTickValue(start, end, i)
+  const longestLabel = $derived.by(() => Math.max(fmt(n).length, ...ticks.map((i) => fmt(tickValue(i)).length)))
 </script>
 
-<svg viewBox="0 0 {W} {H}" class:muted role={interactive ? 'group' : 'img'}
-  aria-label={showPoint ? `Number line from ${start} to ${end} showing ${n}` : `Number line from ${start} to ${end}. Plot ${n}.`}>
+<svg viewBox="0 0 {W} {H}" class:muted class:compact={longestLabel >= 8} class:tight={longestLabel >= 10} role={interactive ? 'group' : 'img'}
+  aria-label={showPoint ? `Number line from ${fmt(start)} to ${fmt(end)} showing ${fmt(n)}` : `Number line from ${fmt(start)} to ${fmt(end)}. Plot ${fmt(n)}.`}>
   <line x1={PAD - 40} y1={Y} x2={W - PAD + 40} y2={Y} class="rail" />
   <polygon points="{PAD - 54},{Y} {PAD - 36},{Y - 9} {PAD - 36},{Y + 9}" class="arrowhead" />
   <polygon points="{W - PAD + 54},{Y} {W - PAD + 36},{Y - 9} {W - PAD + 36},{Y + 9}" class="arrowhead" />
@@ -54,12 +55,12 @@
     {/if}
   {/each}
 
-  <g class="label" class:found={showStart || labels} class:winner={highlight === start}>
+  <g class="label" class:found={showStart || labels} class:winner={sameNumber(highlight, start)}>
     <text x={PAD} y={Y + 58} text-anchor="middle">{showStart || labels ? fmt(start) : '?'}</text>
     <text class="tag" x={PAD} y={Y + 84} text-anchor="middle">start</text>
   </g>
 
-  <g class="label" class:found={showEnd || labels} class:winner={highlight === end}>
+  <g class="label" class:found={showEnd || labels} class:winner={sameNumber(highlight, end)}>
     <text x={W - PAD} y={Y + 58} text-anchor="middle">{showEnd || labels ? fmt(end) : '?'}</text>
     <text class="tag" x={W - PAD} y={Y + 84} text-anchor="middle">end</text>
   </g>
@@ -107,9 +108,13 @@
   .tick.major { stroke-width: 5; }
   .tick.midtick { stroke: var(--purple); }
   .minor-label { font-size: 22px; font-weight: 600; fill: var(--muted); }
+  svg.compact .minor-label { font-size: 18px; }
+  svg.tight .minor-label { font-size: 15px; }
   .plot-target { fill: transparent; cursor: pointer; outline: none; }
   .plot-target:hover, .plot-target:focus-visible { fill: color-mix(in srgb, var(--blue) 16%, transparent); stroke: var(--blue); stroke-width: 3; }
   .label text { font-size: 42px; font-weight: 800; fill: #b6bcc8; }
+  svg.compact .label text { font-size: 34px; }
+  svg.tight .label text { font-size: 30px; }
   .label .tag {
     font-size: 19px;
     font-weight: 700;
@@ -124,6 +129,8 @@
   .drop { stroke: var(--red); stroke-width: 3; stroke-dasharray: 6 5; }
   .point { fill: var(--red); stroke: #fff; stroke-width: 4; }
   .n { font-size: 36px; font-weight: 800; fill: var(--red); }
+  svg.compact .n { font-size: 30px; }
+  svg.tight .n { font-size: 26px; }
   .student-drop { stroke: var(--blue); stroke-width: 4; }
   .student-point { fill: var(--blue); stroke: #fff; stroke-width: 4; }
   .jump { stroke: var(--green); stroke-width: 7; stroke-linecap: round; opacity: 0.9; }

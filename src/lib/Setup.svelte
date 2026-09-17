@@ -3,7 +3,7 @@
   // grab the link to send to students on the right.
   import NumberLine from './NumberLine.svelte'
   import { makeQr, qrPng } from './qr.js'
-  import { roundingParts, fmt } from './rounding.js'
+  import { fmt, sampleProblem } from './rounding.js'
   import {
     DEFAULT_SETTINGS, MAXES, MAX_QUESTIONS, UNITS,
     clampCount, describeSettings, settingsToQuery, usableUnits,
@@ -14,13 +14,9 @@
   const link = $derived(`${window.location.origin}/practice?${settingsToQuery(settings)}`)
   const qr = $derived(makeQr(link))
 
-  // A sample question for the preview: the largest unit, a number near the top
-  // of the range, sitting a little past halfway so the arrow points right.
-  const sample = $derived.by(() => {
-    const unit = Math.max(...settings.units)
-    const n = Math.min(settings.max - 1, Math.max(1, Math.floor((settings.max * 0.65) / unit) * unit + unit / 2 + Math.floor(unit / 5)))
-    return { n, unit, ...roundingParts(n, unit) }
-  })
+  // A sample question for the preview: the largest selected unit, with a
+  // number a little past halfway so the arrow points right.
+  const sample = $derived.by(() => sampleProblem(settings))
 
   function toggleUnit(u) {
     const has = settings.units.includes(u)
@@ -82,7 +78,7 @@
 
       <fieldset>
         <h3 class="legend">Numbers up to</h3>
-        <p class="hint">Classroom number lines usually go to 100. Larger ranges give three- and four-digit numbers.</p>
+        <p class="hint">Use 1 for decimal place-value practice, or larger ranges for thousands and millions.</p>
         <div class="chips">
           {#each MAXES as m (m)}
             <button type="button" class="chip" class:on={settings.max === m} onclick={() => setMax(m)}>{fmt(m)}</button>

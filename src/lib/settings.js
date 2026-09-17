@@ -1,11 +1,13 @@
 // Turns the activity settings into URL text (for a shareable link) and back.
 
-export const UNITS = [10, 100, 1000]
-export const MAXES = [100, 1000, 10000]
+import { fmt } from './rounding.js'
+
+export const UNITS = [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000, 100000, 1000000]
+export const MAXES = [1, 10, 100, 1000, 10000, 100000, 1000000, 10000000]
 export const MAX_QUESTIONS = 100
 
 export const DEFAULT_SETTINGS = {
-  units: [10],      // round to the nearest 10, 100, and/or 1,000
+  units: [10],      // round to any place from thousandths through millions
   max: 100,         // numbers go up to this (like the classroom 0–100 line)
   count: 10,        // questions in the drill
   mode: 'guided',   // 'guided' asks start, end, midpoint then round; 'quick' just asks round
@@ -34,6 +36,7 @@ export function settingsFromParams(params) {
     .split(',')
     .map(Number)
     .filter((u) => UNITS.includes(u) && u <= max)
+    .sort((a, b) => a - b)
   const mode = params.get('mode') === 'quick' ? 'quick' : 'guided'
   return {
     units: units.length ? units : usableUnits(max, d.units),
@@ -46,10 +49,11 @@ export function settingsFromParams(params) {
   }
 }
 
-/** Keep the chosen units inside the range, falling back to the smallest. */
+/** Keep the chosen units inside the range, falling back to the largest usable unit. */
 export function usableUnits(max, units) {
-  const kept = units.filter((u) => u <= max)
-  return kept.length ? kept : [UNITS[0]]
+  const kept = units.filter((u) => u <= max).sort((a, b) => a - b)
+  if (kept.length) return kept
+  return [[...UNITS].reverse().find((u) => u <= max) ?? UNITS[0]]
 }
 
 export function clampCount(v, fallback) {
@@ -66,11 +70,11 @@ function bool(v, fallback) {
 
 /** A one-line summary of the settings, for the start gate and the report. */
 export function describeSettings(s) {
-  const units = s.units.map((u) => u.toLocaleString('en-US'))
+  const units = s.units.map((u) => fmt(u))
   const unitText = units.length === 1 ? units[0] : units.slice(0, -1).join(', ') + ' or ' + units.at(-1)
   const parts = [
     `Round to the nearest ${unitText}`,
-    `numbers up to ${s.max.toLocaleString('en-US')}`,
+    `numbers up to ${fmt(s.max)}`,
     `${s.count} question${s.count === 1 ? '' : 's'}`,
     s.mode === 'guided' ? 'guided steps' : 'quick rounding',
   ]

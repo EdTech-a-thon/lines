@@ -3,7 +3,7 @@
   // entirely on this device and ends with a report the teacher can read.
   import { onDestroy, tick } from 'svelte'
   import NumberLine from './NumberLine.svelte'
-  import { STEPS, explainRounding, fmt, randomProblem, stepAnswer, stepHint, stepQuestion } from './rounding.js'
+  import { STEPS, explainRounding, fmt, randomProblem, sameNumber, stepAnswer, stepHint, stepQuestion } from './rounding.js'
   import { describeSettings } from './settings.js'
 
   let { settings } = $props()
@@ -15,8 +15,10 @@
       : settings.plot ? ['plot', 'round'] : ['round'],
   )
 
+  const newProblem = (avoid = null) => randomProblem(settings, avoid)
+
   let phase = $state('ready') // ready | running | done
-  let problem = $state(randomProblem(settings))
+  let problem = $state(newProblem())
   let index = $state(0) // which question, 0-based
   let stepIndex = $state(0)
   let input = $state('')
@@ -48,7 +50,7 @@
     clearInterval(ticker)
     ticker = setInterval(() => (elapsedMs = Date.now() - startTime), 500)
     phase = 'running'
-    loadQuestion(randomProblem(settings))
+    loadQuestion(newProblem())
   }
 
   function loadQuestion(p) {
@@ -79,7 +81,7 @@
   function answer(guess) {
     if (locked) return
     const want = stepAnswer(step, problem)
-    if (guess === want) {
+    if (sameNumber(guess, want)) {
       feedback = {
         ok: true,
         msg: step === 'round'
@@ -152,7 +154,7 @@
       finish()
       return
     }
-    loadQuestion(randomProblem(settings, problem.n))
+    loadQuestion(newProblem(problem.n))
   }
 
   function finish() {
@@ -240,7 +242,7 @@
         </div>
       {:else}
         <form class="answer" onsubmit={(e) => { e.preventDefault(); submitInput() }}>
-          <input type="number" inputmode="numeric" bind:this={inputEl} bind:value={input} disabled={locked} aria-label="Your answer" />
+          <input type="number" inputmode="decimal" step="any" bind:this={inputEl} bind:value={input} disabled={locked} aria-label="Your answer" />
           <button type="submit" class="btn-primary" disabled={locked}>Check</button>
           {#if settings.retry && wrongTries >= 2}
             <button type="button" class="btn-ghost" onclick={showMe}>Show me</button>
